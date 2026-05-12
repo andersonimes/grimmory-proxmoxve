@@ -208,6 +208,12 @@ function update_script() {
 
     rm -rf /opt/grimmory_bak /opt/booklore_bak
     msg_ok "Started Service"
+
+    cat > /usr/bin/update <<'UPDATE_EOF'
+PHS_SILENT=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/andersonimes/grimmory-proxmoxve/main/ct/grimmory.sh)"
+UPDATE_EOF
+    chmod +x /usr/bin/update
+
     msg_ok "Updated successfully!"
   fi
   exit

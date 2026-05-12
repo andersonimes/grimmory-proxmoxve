@@ -88,3 +88,8 @@ msg_ok "Created Service"
 motd_ssh
 customize
 cleanup_lxc
+
+cat > /usr/bin/update <<'UPDATE_EOF'
+PHS_SILENT=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/andersonimes/grimmory-proxmoxve/main/ct/grimmory.sh)"
+UPDATE_EOF
+chmod +x /usr/bin/update

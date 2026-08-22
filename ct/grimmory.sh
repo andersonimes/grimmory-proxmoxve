@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
-source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func)
+# build.func hardcodes the community-scripts repo when fetching install/<app>-install.sh
+# and exposes no override. community-scripts has no grimmory entry (it 404s), so a fresh
+# build_container would never reach install/grimmory-install.sh in this repo. Rewrite just
+# that path prefix; every other community-scripts URL is left untouched.
+source <(curl -fsSL https://raw.githubusercontent.com/community-scripts/ProxmoxVE/main/misc/build.func |
+  sed 's|community-scripts/ProxmoxVE/main/install/|andersonimes/grimmory-proxmoxve/main/install/|g')
 # Copyright (c) 2021-2026 community-scripts ORG
 # Author: MickLesk (CanbiZ)
 # License: MIT | https://github.com/community-scripts/ProxmoxVE/raw/main/LICENSE
@@ -219,10 +224,13 @@ UPDATE_EOF
   exit
 }
 
+# NOTE: no trailing `update_script "$@"`. start() already routes to update_script()
+# when this script is re-run from inside the container (via /usr/bin/update). Calling
+# it after build_container runs it on the *host*, where /opt/grimmory does not exist,
+# so a successful install ends with a spurious "No BookLore or Grimmory Installation Found!".
 start
 build_container
 description
-update_script "$@"
 
 msg_ok "Completed successfully!\n"
 echo -e "${CREATING}${GN}${APP} setup has been successfully initialized!${CL}"
